@@ -1,0 +1,31 @@
+db.createCollection("books")
+
+db.books.insertMany([
+  { TITLE: "MongoDB Basics", DESCRIPTION: "Introduction to MongoDB", BY: "John", URL: "url1", TAGS: ["database", "nosql"], LIKES: 15 },
+  { TITLE: "MongoDB Advanced", DESCRIPTION: "Advanced MongoDB concepts", BY: "Jane", URL: "url2", TAGS: ["database", "nosql", "advanced"], LIKES: 8 },
+  { TITLE: "MongoDB for Beginners", DESCRIPTION: "Getting started with MongoDB", BY: "John", URL: "url3", TAGS: ["database", "beginner"], LIKES: 5 },
+  { TITLE: "MongoDB in Action", DESCRIPTION: "Practical guide to MongoDB", BY: "Bob", URL: "url4", TAGS: ["database", "practical"], LIKES: 20 },
+  { TITLE: "Mastering MongoDB", DESCRIPTION: "In-depth knowledge of MongoDB", BY: "Alice", URL: "url5", TAGS: ["database", "mastering"], LIKES: 12 }
+])
+
+db.books.insertOne({ TITLE: "MongoDB User Comments", DESCRIPTION: "User feedback on MongoDB", BY: "Eve", URL: "url6", TAGS: ["database", "user feedback"], LIKES: 25, USERNAME: "user1", COMMENTS: "Great content!" })
+
+db.books.find({ TITLE: "mongodb" })
+
+db.books.find({ $or: [{ BY: "john" }, { TITLE: "mongodb" }] })
+
+db.books.find({ TITLE: "mongodb", BY: "john" })
+
+db.books.find({ LIKES: { $gt: 10 } })
+
+db.books.find({ BY: "john" }).limit(1).skip(1)
+
+db.books.find().sort({ TITLE: 1 })
+
+db.books.aggregate([{ $match: { BY: "John" } }, { $group: { _id: null, avgLikes: { $avg: "$LIKES" } } }])
+
+db.books.find({ BY: "John" }).sort({ _id: 1 }).limit(1)
+db.books.find({ BY: "John" }).sort({ _id: -1 }).limit(1)
+
+
+
