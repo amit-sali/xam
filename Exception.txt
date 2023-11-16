@@ -1,0 +1,64 @@
+/*Write PL/SQLcode block: Use of Control structure and Exception handling is mandatory.
+Suggested Problem statement:
+1.	Consider Tables: 1.  bot (Roll_no, Name, Date_of_Issue, Name_of_Book, Status) 2.  fit (Roll_no, Date, Amt) 
+2.	Accept Roll_no and Name_of_Book from user. 
+3.	Check the number of days (from Date_of_Issue). 
+4.	If days are between 15 to 30 then fine amount will be Rs 5per day. 
+5.	If no. of days>30, per day fine will be Rs 50 per day and for days less than 30, Rs. 5 per day. 
+6.	After submitting the book, status will change from I to R. 
+7.	If condition of fine is true, then details will be stored into fit table. 
+8.	Also handles the exception by named exception handler or user define exception handler.*/
+
+
+SET SERVEROUTPUT ON;
+
+CREATE TABLE borrower (Roll_no INT, Name VARCHAR2(20), Date_of_Issue DATE, Name_of_Book VARCHAR2(20), Status VARCHAR2(2));
+CREATE TABLE fine (Roll_no INT, Date_ DATE, Amt INT);
+
+INSERT INTO borrower VALUES (7, 'Ronaldo', DATE '2023-08-25', 'abcd', 'I');
+INSERT INTO borrower VALUES (10, 'Messi', DATE '2023-09-01', 'pqrs', 'I');
+INSERT INTO borrower VALUES (11, 'Chhetri', DATE '2023-08-15', 'wxyz', 'I');
+
+DECLARE
+  FineException EXCEPTION;
+  PRAGMA EXCEPTION_INIT(FineException, -20001);
+  
+  PROCEDURE fine_calculator(p_rollno IN INT) AS
+    v_fine1 INT;
+    v_DOI DATE;
+    v_no_of_days INT;
+  BEGIN
+    SELECT Date_of_Issue INTO v_DOI FROM borrower WHERE Roll_no = p_rollno;
+    v_no_of_days := TRUNC(SYSDATE - v_DOI);
+
+    IF v_no_of_days > 15 AND v_no_of_days <= 30 THEN
+      v_fine1 := v_no_of_days * 5;
+      INSERT INTO fine VALUES (p_rollno, SYSDATE, v_fine1);
+    ELSIF v_no_of_days > 30 THEN
+      v_fine1 := (v_no_of_days - 30) * 50 + 15 * 5;
+      INSERT INTO fine VALUES (p_rollno, SYSDATE, v_fine1);
+    ELSE
+      INSERT INTO fine VALUES (p_rollno, SYSDATE, 0);
+    END IF;
+
+    UPDATE borrower SET Status = 'R' WHERE Roll_no = p_rollno;
+    
+    IF v_fine1 > 500 THEN
+      RAISE FineException;
+    END IF;
+  EXCEPTION
+    WHEN FineException THEN
+      DBMS_OUTPUT.PUT_LINE('Fine exceeds 500 Rs. Cannot proceed.');
+  END fine_calculator;
+BEGIN
+  fine_calculator(7);
+  fine_calculator(10);
+  fine_calculator(11);
+END;
+/
+
+SELECT 'Following is the borrower table' AS "" FROM DUAL;
+SELECT * FROM borrower;
+
+SELECT 'Following is the fine table' AS "" FROM DUAL;
+SELECT * FROM fine;
