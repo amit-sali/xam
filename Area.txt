@@ -1,0 +1,35 @@
+create database area;
+use area;
+
+-- Create the areas table
+CREATE TABLE areas (
+  length INT,
+  breadth INT,
+  area INT,
+  perimeter INT
+);
+
+-- Insert values for lengths from 10 to 20 with a constant breadth of 10
+INSERT INTO areas (length, breadth, area, perimeter)
+SELECT 
+  length,
+  10 AS breadth,
+  length * 10 AS area,
+  (2 * length) + (2 * 10) AS perimeter
+FROM 
+  (SELECT 10 AS length
+   UNION SELECT 11
+   UNION SELECT 12
+   UNION SELECT 13
+   UNION SELECT 14
+   UNION SELECT 15
+   UNION SELECT 16
+   UNION SELECT 17
+   UNION SELECT 18
+   UNION SELECT 19
+   UNION SELECT 20) AS lengths;
+
+-- Display the contents of the areas table
+SELECT * FROM areas;
+
+drop database area;
