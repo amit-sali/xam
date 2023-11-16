@@ -1,0 +1,32 @@
+/*Write a PL/SQL code block to calculate the area and perimeter of a rectangle for a value of length varying from 10 to 20 and breadth 10. Store the length and breadth and the corresponding values of the calculated area and perimeter in an empty table named areas, consisting of three  columns, length, breadth  and area.*/
+
+SET SERVEROUTPUT ON;
+ 
+CREATE TABLE calculate (length INT, breadth INT, area INT);
+
+CREATE OR REPLACE PROCEDURE calculate_area_perimeter AS
+    v_length INT;
+    v_breadth INT;
+    v_areaf INT;
+    v_perimeter INT;
+
+BEGIN
+    v_breadth := 10;
+    v_length := 10;
+
+    WHILE v_length <= 20 LOOP
+        v_areaf := v_length * v_breadth;
+        v_perimeter := 2 * (v_length + v_breadth);
+
+        INSERT INTO calculate VALUES (v_length, v_breadth, v_areaf);
+
+        DBMS_OUTPUT.PUT_LINE('Length: ' || v_length || ', Breadth: ' || v_breadth || ', Area: ' || v_areaf || ', Perimeter: ' || v_perimeter);
+
+        v_length := v_length + 1;
+    END LOOP;
+END calculate_area_perimeter;
+/
+
+SET SERVEROUTPUT ON;
+
+EXEC calculate_area_perimeter;
