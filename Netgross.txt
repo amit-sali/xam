@@ -1,0 +1,90 @@
+create database salary;
+use salary;
+
+
+-- Create Employee table
+-- Create Employee table
+CREATE TABLE Employee (
+    Empid INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Basic_salary DECIMAL(10,2),
+    Type VARCHAR(20)
+);
+
+-- Insert sample data
+INSERT INTO Employee VALUES (1, 'John Doe', 30000, 'Permanent');
+INSERT INTO Employee VALUES (2, 'Jane Doe', 25000, 'Temporary');
+-- ... (add more sample data)
+
+-- Create a stored procedure for calculating salary
+DELIMITER //
+
+CREATE PROCEDURE CalculateSalary()
+BEGIN
+    DECLARE v_empid INT;
+    DECLARE v_name VARCHAR(50);
+    DECLARE v_basic_salary DECIMAL(10,2);
+    DECLARE v_type VARCHAR(20);
+    DECLARE v_da DECIMAL(10,2);
+    DECLARE v_hra DECIMAL(10,2);
+    DECLARE v_gross_salary DECIMAL(10,2);
+    DECLARE v_income_tax DECIMAL(10,2) DEFAULT 2000;
+    DECLARE v_deductions DECIMAL(10,2);
+    DECLARE v_net_salary DECIMAL(10,2);
+
+    -- Cursor to iterate through employees
+    DECLARE employee_cursor CURSOR FOR
+        SELECT Empid, Name, Basic_salary, Type
+        FROM Employee;
+
+    -- Handlers if needed
+
+    OPEN employee_cursor;
+
+    employee_loop: LOOP
+        FETCH employee_cursor INTO v_empid, v_name, v_basic_salary, v_type;
+        IF v_empid IS NULL THEN
+            LEAVE employee_loop;
+        END IF;
+
+        -- Calculate DA
+        SET v_da = 1.15 * v_basic_salary;
+
+        -- Calculate HRA (limited to 20000)
+        SET v_hra = 0.12 * v_basic_salary;
+        IF v_hra > 20000 THEN
+            SET v_hra = 20000;
+        END IF;
+
+        -- Calculate Gross Salary
+        IF v_type = 'Permanent' THEN
+            SET v_gross_salary = v_da + v_hra;
+        ELSE
+            SET v_gross_salary = v_basic_salary;
+        END IF;
+
+        -- Calculate Deductions
+        SET v_deductions = v_income_tax;
+
+        -- Calculate Net Salary
+        SET v_net_salary = v_gross_salary - v_deductions;
+
+        -- Display the results
+        SELECT 
+            v_empid as 'Employee ID' ,
+            v_name as 'Employee Name',
+            v_gross_salary as 'Gross Salary',
+            v_deductions as 'Deductions',
+            v_net_salary as 'Net Salary';
+    END LOOP;
+
+    CLOSE employee_cursor;
+END //
+
+DELIMITER ;
+
+-- Call the stored procedure
+CALL CalculateSalary();
+
+
+drop database salary;
